@@ -1,0 +1,23 @@
+type: default
+time: 1s
+memory: 256m
+subtasks:
+  - score: 100
+    type: sum
+    cases:
+      - input: /^([a-zA-Z]*)([0-9]+).in$/
+        output: /^([a-zA-Z]*)([0-9]+).out$/
+      - input: /^([a-zA-Z]*)([0-9]+).in$/
+        output: /^([a-zA-Z]*)([0-9]+).ans$/
+      - input: /^(input)([0-9]+).txt$/
+        output: /^(output)([0-9]+).txt$/
+      - input: /^(input)([0-9]+).txt$/
+        output: /^(answer)([0-9]+).txt$/
+fileIO:
+  input: __stdin__
+  output: __stdout__
+checker:
+  type: default
+  name: lcmp
+submits:
+  - name: main

@@ -1,0 +1,43 @@
+type: default
+time: 1s
+memory: 256m
+subtasks:
+  - score: 10
+    type: sum
+    id: 1
+    cases:
+      - 1a
+      - 1b
+      - 1c
+  - score: 20
+    type: min
+    id: 2
+    cases:
+      - input: input2a.txt
+        output: output2a.txt
+      - input: input2b.txt
+        output: output2b.txt
+  - score: 30
+    type: min
+    id: 3
+    time: 2s
+    memory: 512m
+    depends: [2]
+    cases:
+      - /3[a-zA-Z]/
+  - score: 40
+    type: max
+    id: 4
+    depends: [1, 2]
+    cases:
+      - input: /^input(4[a-zA-Z]).txt$/
+        output: /^output(4[a-zA-Z]).txt$/
+inputFile: "#.in"
+outputFile: "#.ans"
+fileIO:
+  input: __stdin__
+  output: __stdout__
+checker:
+  type: custom
+  name: spj_cpp17.cpp
+  language: cpp17

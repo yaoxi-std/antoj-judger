@@ -1,0 +1,81 @@
+checker:
+  language: cpp17
+  name: spj_cpp17.cpp
+  type: custom
+extraJudgerInfo: {}
+extraSourceFiles: []
+fileIO:
+  input: __stdin__
+  output: __stdout__
+memory: 256.0MB
+submits:
+- languages:
+  - c
+  - cpp
+  - cpp11
+  - cpp14
+  - cpp17
+  - cpp11-clang
+  - cpp17-clang
+  - haskell
+  - pascal
+  - java
+  - python2
+  - python3
+  - rust
+  - nodejs
+  - swift
+  - csharp
+  name: main
+subtasks:
+- cases:
+  - input: 1a.in
+    output: 1a.ans
+  - input: 1b.in
+    output: 1b.ans
+  - input: 1c.in
+    output: 1c.ans
+  depends: []
+  id: 1
+  memory: 256.0MB
+  score: 10.0
+  time: 1.0s
+  type: sum
+- cases:
+  - input: input2a.txt
+    output: output2a.txt
+  - input: input2b.txt
+    output: output2b.txt
+  depends: []
+  id: 2
+  memory: 256.0MB
+  score: 20.0
+  time: 1.0s
+  type: min
+- cases:
+  - input: 3a.in
+    output: 3a.ans
+  - input: 3b.in
+    output: 3b.ans
+  - input: 3c.in
+    output: 3c.ans
+  depends:
+  - 2
+  id: 3
+  memory: 512.0MB
+  score: 30.0
+  time: 2.0s
+  type: min
+- cases:
+  - input: input4a.txt
+    output: output4a.txt
+  depends:
+  - 1
+  - 2
+  id: 4
+  memory: 256.0MB
+  score: 40.0
+  time: 1.0s
+  type: max
+time: 1.0s
+type: default

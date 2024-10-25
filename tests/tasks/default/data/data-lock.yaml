@@ -1,0 +1,58 @@
+checker:
+  name: lcmp
+  type: default
+extraJudgerInfo: {}
+extraSourceFiles: []
+fileIO:
+  input: __stdin__
+  output: __stdout__
+memory: 256.0MB
+submits:
+- languages:
+  - c
+  - cpp
+  - cpp11
+  - cpp14
+  - cpp17
+  - cpp11-clang
+  - cpp17-clang
+  - haskell
+  - pascal
+  - java
+  - python2
+  - python3
+  - rust
+  - nodejs
+  - swift
+  - csharp
+  name: main
+subtasks:
+- cases:
+  - input: 1.in
+    output: 1.ans
+  - input: 2.in
+    output: 2.ans
+  - input: 3.in
+    output: 3.ans
+  - input: 4.in
+    output: 4.ans
+  - input: 5.in
+    output: 5.ans
+  - input: 6.in
+    output: 6.ans
+  - input: 7.in
+    output: 7.ans
+  - input: 8.in
+    output: 8.ans
+  - input: 9.in
+    output: 9.ans
+  - input: 10.in
+    output: 10.ans
+  depends: []
+  id: 1
+  memory: 256.0MB
+  score: 100.0
+  time: 1.0s
+  type: sum
+time: 1.0s
+type: default

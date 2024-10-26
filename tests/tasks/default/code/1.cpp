@@ -1,4 +1,3 @@
-#include "testlib.h"
 #include <bits/stdc++.h>
 using namespace std;
 #define debug(fmt, ...) \
@@ -18,21 +17,16 @@ using u128 = __uint128_t;
 bool Mbe;
 
 bool Med;
-int main(int argc, char* argv[]) {
-  registerTestlibCmd(argc, argv);
-  string x = ouf.readToken();
-  string y = ans.readToken();
-  if (x == y) {
-    quitf(_ok, "aCCePteD");
-  } else if (x.size() == 2 && y.size() == 2 && x[0] == y[1] && x[1] == y[0]) {
-    cerr << "shuodedaoli.\n";
-    quitp(50, "sWAP");
-  } else {
-    quitf(_wa, "wRoNG");
-  }
+int main() {
+  // debug("Mem: %.4lfMB.", fabs(&Med - &Mbe) / 1048576);
+  cin.tie(0)->sync_with_stdio(0);
+  uint a, b;
+  cin >> a >> b;
+  cout << a + b << '\n';
+  cerr << "Hello world!\n";
   return 0;
 }
 /*
-g++ -std=c++14 -O2 -o spj_cpp17 spj_cpp17.cpp -Wall -Wextra -Wshadow
+g++ -std=c++14 -O2 -o 1 1.cpp -Wall -Wextra -Wshadow
 -fsanitize=address,undefined -g
 */

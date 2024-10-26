@@ -1,6 +1,6 @@
 type: default
-time: 1s
-memory: 256m
+time: 1.0s
+memory: 256.0MB
 subtasks:
   - score: 100
     type: sum
@@ -19,5 +19,5 @@ fileIO:
 checker:
   type: default
   name: lcmp
-submits:
-  - name: main
+submitFiles:
+  - name: code

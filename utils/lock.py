@@ -7,8 +7,8 @@ import yaml
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 
-DATA_YAML_DEFAULT: dict = yaml.load(
-    open(os.path.join(DIR, "../defaults/data.yaml"), "r"), Loader=yaml.FullLoader) or {}
+with open(os.path.join(DIR, "../defaults/data.yaml"), "r") as f:
+  DATA_YAML_DEFAULT: dict = yaml.load(f, Loader=yaml.FullLoader) or {}
 
 INTERNAL_CHECKERS = ["fcmp", "hcmp", "lcmp", "ncmp",
                      "nyesno", "rcmp4", "rcmp6", "rcmp9", "wcmp", "yesno"]
@@ -26,33 +26,33 @@ def lock(data: dict, base_dir: str) -> dict:
       raise ValueError(f"Invalid type: {type}")
     return type
 
-  def parse_time(time: str) -> str:
+  def parse_time(time: str) -> float:
     time = str(time)
     if time.endswith("ms"):
-      return str(float(time[:-2]) / 1000) + "s"
+      return float(time[:-2]) / 1000
     elif time.endswith("s"):
-      return str(float(time[:-1])) + "s"
+      return float(time[:-1])
     else:
       raise ValueError(f"Invalid time format: `{time}`")
 
-  def parse_memory(memory: str) -> str:
+  def parse_memory(memory: str) -> float:
     def with_suffix(s: str, suffix: str) -> bool:
       return s.lower().endswith(suffix.lower())
 
     memory = str(memory)
 
     if with_suffix(memory, "KB"):
-      return str(float(memory[:-2]) / 1024) + "MB"
+      return float(memory[:-2]) / 1024
     elif with_suffix(memory, "MB"):
-      return str(float(memory[:-2])) + "MB"
+      return float(memory[:-2])
     elif with_suffix(memory, "GB"):
-      return str(float(memory[:-2]) * 1024) + "MB"
+      return float(memory[:-2]) * 1024
     elif with_suffix(memory, "k"):
-      return str(float(memory[:-1]) / 1024) + "MB"
+      return float(memory[:-1]) / 1024
     elif with_suffix(memory, "m"):
-      return str(float(memory[:-1])) + "MB"
+      return float(memory[:-1])
     elif with_suffix(memory, "g"):
-      return str(float(memory[:-1]) * 1024) + "MB"
+      return float(memory[:-1]) * 1024
     else:
       raise ValueError(f"Invalid memory format: `{memory}`")
 
@@ -199,7 +199,9 @@ def lock(data: dict, base_dir: str) -> dict:
           "cases": cases,
       })
 
-    if total_score != 100:
+    type = parse_type(data["type"])
+
+    if total_score != 100 and type not in ["objective", "custom"]:
       raise ValueError(f"Total score of subtasks is not 100: {total_score}")
 
     return subtasks_locked
@@ -284,16 +286,10 @@ def lock(data: dict, base_dir: str) -> dict:
       if language not in LANGUAGES:
         raise ValueError(f"Invalid extra source file language: {language}")
 
-      if "compileWithSource" in file:
-        compile_with_source = file["compileWithSource"]
-      else:
-        compile_with_source = False
-
       extra_locked.append({
           "name": name,
           "dest": dest,
           "language": language,
-          "compileWithSource": compile_with_source,
       })
 
     return extra_locked
@@ -321,19 +317,24 @@ def lock(data: dict, base_dir: str) -> dict:
 
     return locked_langs
 
-  def parse_submit(submits: list) -> list:
-    if submits.__len__() < 1:
+  def parse_submit(submit_files: list) -> list:
+    if submit_files.__len__() < 1:
       raise ValueError("Submit list is empty")
 
-    submit_locked = []
-
     type = parse_type(data["type"])
-    languages = parse_languages(type, data.get("languages"))
+    if submit_files.__len__() > 1 and type != "custom":
+      raise ValueError(
+          "Multiple submit files are only allowed for custom type")
 
     names = set()
+    submit_files_locked = []
+    languages = parse_languages(type, data.get("languages"))
 
-    for sub in submits:
+    for sub in submit_files:
       name = str(sub["name"])
+      if type != "custom" and name != "code":
+        raise ValueError("Invalid submit file name: {name} (should be `code`)")
+
       submit_langs = languages
 
       if name in names:
@@ -343,12 +344,12 @@ def lock(data: dict, base_dir: str) -> dict:
       if "languages" in sub:
         submit_langs = parse_languages(type, sub["languages"])
 
-      submit_locked.append({
+      submit_files_locked.append({
           "name": name,
           "languages": submit_langs,
       })
 
-    return submit_locked
+    return submit_files_locked
 
   data = DATA_YAML_DEFAULT | data
 
@@ -367,7 +368,7 @@ def lock(data: dict, base_dir: str) -> dict:
   locked["subtasks"] = parse_subtasks(data["subtasks"])
   locked["fileIO"] = parse_file_io(data["fileIO"])
   locked["checker"] = parse_checker(data["checker"])
-  locked["submits"] = parse_submit(data["submits"])
+  locked["submitFiles"] = parse_submit(data["submitFiles"])
 
   if locked["type"] == "interactive":
     locked["interactor"] = parse_interactor(data["interactor"])
@@ -392,19 +393,16 @@ def update_lock(base_dir: str, data_yaml_path: str | None = None, data_lock_path
   if not data_lock_path:
     data_lock_path = os.path.join(base_dir, "data-lock.yaml")
 
-  data_yaml = data_lock = {}
+  data_yaml = {}
 
   if os.path.isfile(data_yaml_path):
-    data_yaml = yaml.load(open(data_yaml_path, "r"),
-                          Loader=yaml.FullLoader) or {}
-  if os.path.isfile(data_lock_path):
-    data_lock = yaml.load(open(data_lock_path, "r"),
-                          Loader=yaml.FullLoader) or {}
+    with open(data_yaml_path, "r") as f:
+      data_yaml = yaml.load(f, Loader=yaml.FullLoader) or {}
 
-  data_lock.update(lock(data_yaml, base_dir))
+  data_locked = lock(data_yaml, base_dir)
 
   with open(data_lock_path, "w") as f:
-    f.write(yaml.dump(data_lock))
+    f.write(yaml.dump(data_locked))
 
 
 if __name__ == "__main__":

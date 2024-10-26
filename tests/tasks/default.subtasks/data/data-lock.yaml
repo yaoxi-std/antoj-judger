@@ -2,13 +2,12 @@ checker:
   language: cpp17
   name: spj_cpp17.cpp
   type: custom
-extraJudgerInfo: {}
 extraSourceFiles: []
 fileIO:
   input: __stdin__
   output: __stdout__
-memory: 256.0MB
-submits:
+memory: 256.0
+submitFiles:
 - languages:
   - c
   - cpp
@@ -26,7 +25,7 @@ submits:
   - nodejs
   - swift
   - csharp
-  name: main
+  name: code
 subtasks:
 - cases:
   - input: 1a.in
@@ -37,9 +36,9 @@ subtasks:
     output: 1c.ans
   depends: []
   id: 1
-  memory: 256.0MB
+  memory: 256.0
   score: 10.0
-  time: 1.0s
+  time: 1.0
   type: sum
 - cases:
   - input: input2a.txt
@@ -48,9 +47,9 @@ subtasks:
     output: output2b.txt
   depends: []
   id: 2
-  memory: 256.0MB
+  memory: 256.0
   score: 20.0
-  time: 1.0s
+  time: 1.0
   type: min
 - cases:
   - input: 3a.in
@@ -62,9 +61,9 @@ subtasks:
   depends:
   - 2
   id: 3
-  memory: 512.0MB
+  memory: 512.0
   score: 30.0
-  time: 2.0s
+  time: 2.0
   type: min
 - cases:
   - input: input4a.txt
@@ -73,9 +72,9 @@ subtasks:
   - 1
   - 2
   id: 4
-  memory: 256.0MB
+  memory: 256.0
   score: 40.0
-  time: 1.0s
+  time: 1.0
   type: max
-time: 1.0s
+time: 1.0
 type: default

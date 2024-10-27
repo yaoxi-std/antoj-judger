@@ -64,7 +64,7 @@ subtasks:
   memory: 512.0
   score: 30.0
   time: 2.0
-  type: min
+  type: max
 - cases:
   - input: input4a.txt
     output: output4a.txt
@@ -75,6 +75,6 @@ subtasks:
   memory: 256.0
   score: 40.0
   time: 1.0
-  type: max
+  type: min
 time: 1.0
 type: default

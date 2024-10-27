@@ -106,9 +106,12 @@ def judge(data_path: str, source_path: str, data: dict):
 
     if skip_subtask:
       subtask_result.skip()
+      report_judge_result()
       continue
 
     subtask_result.initialize()
+    subtask_result.update(score if type == "min" else 0)
+    report_judge_result()
 
     # Step 3.3: judge each test case
 
@@ -172,7 +175,7 @@ def judge(data_path: str, source_path: str, data: dict):
 
       # Step 3.3.7: execute checker
 
-      sandbox.exec(checker.run("checker", ["input", "user_out", "answer"]),
+      sandbox.exec(checker.execute("checker", ["input", "user_out", "answer"]),
                    stdin=".stdin", stdout=".stdout", stderr=".stderr",
                    time_limit=10, memory_limit=2048)
 

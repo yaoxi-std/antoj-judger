@@ -18,7 +18,7 @@ subtasks:
       - input: input2b.txt
         output: output2b.txt
   - score: 30
-    type: min
+    type: max
     id: 3
     time: 2s
     memory: 512m
@@ -26,7 +26,7 @@ subtasks:
     cases:
       - /3[a-zA-Z]/
   - score: 40
-    type: max
+    type: min
     id: 4
     depends: [1, 2]
     cases:

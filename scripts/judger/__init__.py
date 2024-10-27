@@ -46,46 +46,47 @@ if __name__ == "__main__":
       {
           "id": 1,
           "data": url_with_md5("default/data.tar"),
-          "submitFiles": [
-              {
-                  "name": "code",
-                  "language": "cpp14",
-                  **url_with_md5("default/code/1.cpp")
-              }
-          ],
+          "submitFiles": [{
+              "name": "code",
+              "language": "cpp14",
+              **url_with_md5("default/code/1.cpp")
+          }],
       },
       {
           "id": 2,
           "data": url_with_md5("default.subtasks/data.tar"),
-          "submitFiles": [
-              {
-                  "name": "code",
-                  "language": "cpp17",
-                  **url_with_md5("default.subtasks/code/1.cpp")
-              }
-          ],
+          "submitFiles": [{
+              "name": "code",
+              "language": "cpp17",
+              **url_with_md5("default.subtasks/code/1.cpp")
+          }],
       },
       {
           "id": 3,
           "data": url_with_md5("default.subtasks/data.tar"),
-          "submitFiles": [
-              {
-                  "name": "code",
-                  "language": "cpp17",
-                  **url_with_md5("default.subtasks/code/2.cpp")
-              }
-          ],
+          "submitFiles": [{
+              "name": "code",
+              "language": "cpp17",
+              **url_with_md5("default.subtasks/code/2.cpp")
+          }],
       },
       {
           "id": 4,
           "data": url_with_md5("default.subtasks/data.tar"),
-          "submitFiles": [
-              {
-                  "name": "code",
-                  "language": "cpp17",
-                  **url_with_md5("default.subtasks/code/3.cpp")
-              }
-          ],
+          "submitFiles": [{
+              "name": "code",
+              "language": "cpp17",
+              **url_with_md5("default.subtasks/code/3.cpp")
+          }],
+      },
+      {
+          "id": 5,
+          "data": url_with_md5("default.subtasks/data.tar"),
+          "submitFiles": [{
+              "name": "code",
+              "language": "cpp17",
+              **url_with_md5("default.subtasks/code/4.cpp")
+          }],
       },
   ]
 

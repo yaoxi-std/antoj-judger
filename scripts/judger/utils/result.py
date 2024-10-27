@@ -90,9 +90,11 @@ class SubtaskResult:
 
   def update(self, score: float):
     self.score = score
-    self.max_time = max(self.max_time, self.cases[-1].time)
-    self.max_memory = max(self.max_memory, self.cases[-1].memory)
-    self.total_time += self.cases[-1].time
+
+    if self.cases.__len__() > 0:
+      self.max_time = max(self.max_time, self.cases[-1].time)
+      self.max_memory = max(self.max_memory, self.cases[-1].memory)
+      self.total_time += self.cases[-1].time
 
   def finalize(self):
     status = Status.Accepted

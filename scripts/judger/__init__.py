@@ -20,6 +20,22 @@ def judge(task: dict):
     if data["type"] == "default":
       from .default import judge
       judge(data_path, source_path, data)
+    elif data["type"] == "interactive":
+      from .interactive import judge
+      judge(data_path, source_path, data)
+    elif data["type"] == "submit-answer":
+      from .submit_answer import judge
+      judge(data_path, source_path, data)
+    elif data["type"] == "objective":
+      from .objective import judge
+      judge(data_path, source_path, data)
+    elif data["type"] == "custom":
+      from .custom import judge
+      judge(data_path, source_path, data)
+    else:
+      judge_result.score = 0
+      judge_result.status = Status.SystemError
+      judge_result.message = "Unknown judge type: " + data["type"]
 
   except Exception as e:
     logging.error(e)

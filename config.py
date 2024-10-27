@@ -23,7 +23,9 @@ SANDBOX_DATA_PATH = os.getenv(
     "SANDBOX_DATA_PATH", os.path.join(TMP_PATH, "sandbox"))
 HOST_SANDBOX_DATA_PATH = os.getenv("HOST_SANDBOX_DATA_PATH", SANDBOX_DATA_PATH)
 
-JUDGER_IDLE_TIME = 5
+JUDGER_IDLE_TIME = os.getenv("JUDGER_IDLE_TIME", 5)
+
+ALLOW_CUSTOM_JUDGER = os.getenv("ALLOW_CUSTOM_JUDGER", "false") == "true" or DEBUG
 
 if not os.path.exists(TMP_PATH):
   os.makedirs(TMP_PATH)

@@ -270,8 +270,6 @@ def lock(data: dict, base_dir: str) -> dict:
     }
 
   def parse_extra(extra: list) -> list:
-    extra = extra or []
-
     extra_locked = []
 
     for file in extra:
@@ -372,7 +370,7 @@ def lock(data: dict, base_dir: str) -> dict:
         "name": "code",
         "languages": parse_languages(locked["type"], data.get("languages")),
     }]
-    locked["extraSourceFiles"] = parse_extra(data.get("extraSourceFiles"))
+    locked["extraSourceFiles"] = parse_extra(data.get("extraSourceFiles", []))
 
     if locked["type"] == "interactive":
       locked["interactor"] = parse_interactor(data["interactor"])
@@ -398,8 +396,13 @@ def lock(data: dict, base_dir: str) -> dict:
           "name": "code",
           "languages": parse_languages(locked["type"], data.get("languages")),
       }]
-    locked["extraSourceFiles"] = parse_extra(data.get("extraSourceFiles"))
+    locked["extraSourceFiles"] = parse_extra(data.get("extraSourceFiles", []))
     locked["extraJudgerInfo"] = data["extraJudgerInfo"] or {}
+
+    judger = data.get("judger", "judger.py")
+    if not os.path.isfile(os.path.join(base_dir, judger)):
+      raise ValueError(f"Judger file not found: {judger}")
+    locked["judger"] = judger
 
   return locked
 

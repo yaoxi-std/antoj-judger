@@ -53,13 +53,17 @@ class Sandbox:
   def exec_host(self, cmd):
     if isinstance(cmd, list):
       cmd = ' '.join(map(str, cmd))
-    logging.info("exec_host", cmd)
+      
+    logging.debug("exec_host", cmd)
+    
     return os.system(cmd)
 
   def exec_container(self, cmd):
     if isinstance(cmd, list):
       cmd = ' '.join(map(str, cmd))
-    logging.info("exec_container", cmd)
+      
+    logging.debug("exec_container", cmd)
+    
     return self.exec_host([
         "docker", "exec",
         "-w", "/sandbox",

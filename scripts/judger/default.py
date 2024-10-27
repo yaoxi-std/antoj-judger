@@ -19,7 +19,7 @@ def judge(data_path: str, source_path: str, data: dict):
   # Step 1: checker compilation
 
   if data["checker"]["type"] == "default":
-    from .languages import cpp17 as checker
+    from ..languages import cpp17 as checker
     sandbox.push(
         join(config.CHECKER_PATH, data["checker"]["name"] + ".cpp"), "checker.cpp")
   else:

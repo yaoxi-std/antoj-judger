@@ -1,6 +1,15 @@
-LANGUAGES = ["c", "cpp", "cpp11", "cpp14", "cpp17",
-             "cpp11-clang", "cpp17-clang", "haskell", "pascal",
-             "java", "python2", "python3", "rust", "nodejs", "swift", "csharp"]
+import os
 
-INTERNAL_CHECKERS = ["fcmp", "hcmp", "lcmp", "ncmp",
-                     "nyesno", "rcmp4", "rcmp6", "rcmp9", "wcmp", "yesno"]
+from config import BASE_DIR, CHECKER_PATH
+
+LANGUAGES = []
+
+for item in os.listdir(os.path.join(BASE_DIR, "scripts/languages")):
+  if item.endswith(".py"):
+    LANGUAGES.append(item[:-3])
+
+INTERNAL_CHECKERS = []
+
+for item in os.listdir(CHECKER_PATH):
+  if item.endswith(".cpp"):
+    INTERNAL_CHECKERS.append(item[:-4])

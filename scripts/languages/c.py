@@ -1,6 +1,6 @@
 
 def compile(name: str, args: list[str] = []) -> list[str]:
-  return ["gcc", "-O2", "-lm", "-DONLINE_JUDGE", "-o", f"{name}.exe", f"{name}.c", *args]
+  return ["/usr/bin/gcc", "-O2", "-lm", "-DONLINE_JUDGE", "-o", f"{name}.exe", f"{name}.c", *args]
 
 
 def execute(name: str, args: list[str] = []) -> list[str]:

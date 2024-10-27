@@ -2,94 +2,86 @@ import os
 
 import config
 
-from .utils.lang import select_language
-from .utils.report import judge_task, judge_result, report
-from .utils.sandbox import Sandbox
-from .utils.status import merge_status
+from .utils.result import *
 
-MAX_DISPLAY_BYTES = 128
+from .utils.lang import select_language
+from .utils.sandbox import Sandbox
+
+join = os.path.join
 
 
 def judge(data_path: str, source_path: str, data: dict):
   sandbox = Sandbox()
 
-  judge_result["status"] = "Compiling"
-  report()
+  judge_result.initialize_compiling()
+  report_judge_result()
 
-  # Compile checker
+  # Step 1: checker compilation
 
   if data["checker"]["type"] == "default":
-    from .languages import cpp17
-    checker = cpp17
-    sandbox.push(os.path.join(config.CHECKER_PATH,
-                 data["checker"]["name"] + ".cpp"), "checker.cpp")
+    from .languages import cpp17 as checker
+    sandbox.push(
+        join(config.CHECKER_PATH, data["checker"]["name"] + ".cpp"), "checker.cpp")
   else:
     checker = select_language(data["checker"]["language"])
-    sandbox.push(os.path.join(
-        data_path, data["checker"]["name"]), checker.source("checker"))
+    sandbox.push(
+        join(data_path, data["checker"]["name"]), checker.src("checker"))
 
   sandbox.push(config.TESTLIB_PATH, "testlib.h")
+  status = sandbox.exec(checker.compile("checker"),
+                        stdout="compile.log", stderr="compile.log",
+                        time_limit=10, memory_limit=2048).status
 
-  status, _, _, _ = sandbox.exec(checker.compile("checker"),
-                                 stdout="compile.log", stderr="compile.log",
-                                 time_limit=10, memory_limit=2048)
+  if status != Status.Accepted:
+    if status == Status.TimeLimitExceeded:
+      message = "Checker compilation time exceeded.\n"
+    else:
+      message = "Checker compilation failed.\n"
 
-  if status != "Accepted":
-    judge_result["status"] = "System Error"
-    judge_result["score"] = 0
-
-    if status == "Time Limit Exceeded":
-      judge_result["message"] = "Checker compilation time exceeded.\n"
-    judge_result["message"] += sandbox.read("compile.log")
-
-    sandbox.terminate()
-    report()
+    message += sandbox.read("compile.log")
+    judge_result.finalize_compiling(message, status=Status.SystemError)
     return
 
-  sandbox.pull(checker.executable("checker"),
-               os.path.join(source_path, checker.executable("checker")))
+  sandbox.pull(checker.exe("checker"),
+               join(source_path, checker.exe("checker")))
   sandbox.clean()
 
-  # Compile source
+  # Step 2: code compilation
 
-  language = select_language(
-      lang := judge_task["submitFiles"][0]["language"])
+  lang = judge_task["submitFiles"][0]["language"]
 
-  sandbox.push(os.path.join(source_path, "code"), language.source("code"))
+  code = select_language(lang)
+
+  sandbox.push(join(source_path, "code"), code.src("code"))
   for file in data["extraSourceFiles"]:
     if file["language"] == lang:
-      sandbox.push(os.path.join(data_path, file["name"]), file["dest"])
+      sandbox.push(join(data_path, file["name"]), file["dest"])
 
-  status, _, _, _ = sandbox.exec(language.compile("code"),
-                                 stdout="compile.log", stderr="compile.log",
-                                 time_limit=10, memory_limit=2048)
+  status = sandbox.exec(code.compile("code"),
+                        stdout="compile.log", stderr="compile.log",
+                        time_limit=10, memory_limit=2048).status
 
-  if status != "Accepted":
-    judge_result["status"] = "Compile Error"
-    judge_result["score"] = 0
+  if status != Status.Accepted:
+    if status == Status.TimeLimitExceeded:
+      message = "Compilation time exceeded.\n"
+    else:
+      message = "Compilation failed.\n"
 
-    if status == "Time Limit Exceeded":
-      judge_result["message"] = "Compile Time Limit Exceeded\n"
-    judge_result["message"] += sandbox.read("compile.log")
-
-    sandbox.terminate()
-    report()
+    message += sandbox.read("compile.log")
+    judge_result.finalize_compiling(message, status=Status.CompileError)
     return
 
-  judge_result["status"] = "Running"
-  judge_result["message"] = sandbox.read("compile.log")
+  judge_result.finalize_compiling(sandbox.read("compile.log"))
 
-  sandbox.pull(language.executable("code"),
-               os.path.join(source_path, language.executable("code")))
+  sandbox.pull(code.exe("code"), join(source_path, code.exe("code")))
   sandbox.clean()
-  report()
 
-  # Run test cases
+  report_judge_result()
 
-  judge_result["subtasks"] = {}
-  judge_result["max_time"] = 0
-  judge_result["max_memory"] = 0
-  judge_result["total_time"] = 0
+  # Step 3: test cases execution
+
+  judge_result.initialize_running()
+  report_judge_result()
 
   for subtask in data["subtasks"]:
     id = subtask["id"]
@@ -99,147 +91,145 @@ def judge(data_path: str, source_path: str, data: dict):
     time_limit = subtask["time"]
     memory_limit = subtask["memory"]
 
-    skip = False
+    # Step 3.1: initialize subtask result
+
+    subtask_result = SubtaskResult()
+    judge_result.push(id, subtask_result)
+
+    # Step 3.2: check if subtask should be skipped
+
+    skip_subtask = False
     for depend in depends:
       if judge_result["subtasks"][depend]["status"] != "Accepted":
-        skip = True
+        skip_subtask = True
         break
 
-    if skip:
-      judge_result["subtasks"][id] = {
-          "status": "Skipped",
-          "score": 0,
-          "max_time": 0,
-          "max_memory": 0,
-          "total_time": 0,
-      }
+    if skip_subtask:
+      subtask_result.skip()
       continue
 
-    judge_result["subtasks"][id] = {
-        "status": "Running",
-        "score": score if type == "min" else 0,
-        "max_time": 0,
-        "max_memory": 0,
-        "total_time": 0,
-        "cases": [],
-    }
+    subtask_result.initialize()
 
-    for case in subtask["cases"]:
-      input = data["fileIO"]["input"]
-      output = data["fileIO"]["output"]
+    # Step 3.3: judge each test case
 
-      sandbox.push(os.path.join(source_path, language.executable("code")),
-                   language.executable("code"))
+    def judge_case(case: dict) -> float:
 
-      sandbox.push(os.path.join(data_path, case["input"]), input)
+      # Step 3.3.1: initialize case result
 
-      status, debug, time, memory = sandbox.exec(
-          language.run("code"),
-          stdin="__stdin__", stdout="__stdout__", stderr="__stderr__",
-          time_limit=time_limit, memory_limit=memory_limit)
+      input = case["input"]
+      output = case["output"]
 
-      result = {
-          "status": "",
-          "score": 0,
-          "time": time,
-          "memory": memory,
-          "stdout": "",
-          "stderr": "",
-          "message": "",
-      }
+      case_result = CaseResult(input, output)
+      case_result.initialize()
+      subtask_result.push(case_result)
+      report_judge_result()
 
-      if not sandbox.exists(output):
-        status = "File Error"
-      else:
-        result["stdout"] = sandbox.read(output)[:MAX_DISPLAY_BYTES]
+      # Step 3.3.2: copy input and executable files
 
-      result["stderr"] = sandbox.read("__stderr__")[:MAX_DISPLAY_BYTES]
+      file_in = data["fileIO"]["input"]
+      file_out = data["fileIO"]["output"]
+
+      sandbox.push(join(data_path, input), file_in)
+      sandbox.push(join(source_path, code.exe("code")), code.exe("code"))
+
+      # Step 3.3.3: execute user code
+
+      r = sandbox.exec(code.execute("code"),
+                       stdin=".stdin", stdout=".stdout", stderr=".stderr",
+                       time_limit=time_limit, memory_limit=memory_limit)
+
+      # Step 3.3.4: read stdout and stderr
+
+      stderr = ""
+      if sandbox.exists(".stderr"):
+        stderr = sandbox.read(".stderr")
+
+      if not sandbox.exists(file_out):
+        case_result.finalize(Status.FileError, 0,
+                             r.time, r.memory, "", stderr, "")
+        return 0
+
+      stdout = sandbox.read(file_out)
 
       sandbox.pull(output, os.path.join(source_path, "user_out"))
       sandbox.clean()
 
-      judge_result["subtasks"][id]["max_time"] = max(
-          judge_result["subtasks"][id]["max_time"], time)
-      judge_result["subtasks"][id]["max_memory"] = max(
-          judge_result["subtasks"][id]["max_memory"], memory)
-      judge_result["subtasks"][id]["total_time"] += time
+      # Step 3.3.5: check if user code executed successfully
 
-      judge_result["max_time"] = max(judge_result["max_time"], time)
-      judge_result["max_memory"] = max(judge_result["max_memory"], memory)
-      judge_result["total_time"] += time
+      if r.status != Status.Accepted:
+        case_result.finalize(r.status, 0, r.time, r.memory,
+                             stdout, stderr, r.message)
+        return 0
 
-      if status == "Accepted":
-        sandbox.push(os.path.join(data_path, case["input"]), "input")
-        sandbox.push(os.path.join(source_path, "user_out"), "user_out")
-        sandbox.push(os.path.join(data_path, case["output"]), "answer")
-        sandbox.push(os.path.join(source_path, "code"), "code")
-        sandbox.push(os.path.join(source_path, checker.executable("checker")),
-                     checker.executable("checker"))
+      # Step 3.3.6: copy input, output and answer files
 
-        sandbox.write("__stdin__", "")
+      sandbox.push(join(data_path, input), "input")
+      sandbox.push(join(data_path, output), "answer")
+      sandbox.push(join(source_path, "code"), "code")
+      sandbox.push(join(source_path, "user_out"), "user_out")
+      sandbox.push(join(source_path, checker.exe("checker")),
+                   checker.exe("checker"))
 
-        status, debug, time, memory = sandbox.exec(
-            checker.run("checker", ["input", "user_out", "answer"]),
-            stdin="__stdin__", stdout="__stdout__", stderr="__stderr__",
-            time_limit=10, memory_limit=2048)
+      # Step 3.3.7: execute checker
 
-        text = sandbox.read("__stdout__").strip()
-        result["message"] = sandbox.read("__stderr__")[:MAX_DISPLAY_BYTES]
+      sandbox.exec(checker.run("checker", ["input", "user_out", "answer"]),
+                   stdin=".stdin", stdout=".stdout", stderr=".stderr",
+                   time_limit=10, memory_limit=2048)
 
-        try:
-          partial = float(text)
-          result["score"] = partial / 100 * score
+      # Step 3.3.8: parse checker output
 
-          if partial == 0:
-            result["status"] = "Wrong Answer"
-          elif partial == 100:
-            result["status"] = "Accepted"
-          elif 0 < partial < 100:
-            result["status"] = "Partially Correct"
-          else:
-            result["status"] = "System Error"
-            result["score"] = 0
-            result["message"] = "Checker returned score out of range [0, 100]"
+      text = sandbox.read(".stdout")
+      message = sandbox.read(".stderr")
 
-        except ValueError:
-          result["status"] = "System Error"
-          result["score"] = 0
-          result["message"] = "Checker returned non-number score"
+      try:
+        partial = float(text.strip())
+      except:
+        case_result.finalize(Status.SystemError, 0, r.time, r.memory,
+                             stdout, stderr, "Checker returned non-number score.\n" + text + "\n" + message + "\n")
+        return 0
 
+      # Step 3.3.9: finalize case result
+
+      partial = max(0, min(100, partial))
+
+      if partial == 0:
+        case_result.finalize(Status.WrongAnswer, 0, r.time, r.memory,
+                             stdout, stderr, message)
+        return 0
+      elif partial == 100:
+        case_result.finalize(Status.Accepted, score, r.time, r.memory,
+                             stdout, stderr, message)
+        return score
       else:
-        result["status"] = status
-        result["score"] = 0
-        result["message"] = debug
+        case_result.finalize(Status.PartiallyCorrect, partial / 100 * score, r.time, r.memory,
+                             stdout, stderr, message)
+        return partial / 100 * score
 
-      judge_result["subtasks"][id]["cases"].append(result)
+    cases = subtask["cases"]
+
+    for case in cases:
+      partial = judge_case(case)
+
+      # Step 3.3.10: update subtask result
 
       if type == "sum":
-        judge_result["subtasks"][id]["score"] += (
-            result["score"] / subtask["cases"].__len__())
+        subtask_result.update(subtask_result.score + partial / cases.__len__())
       elif type == "min":
-        judge_result["subtasks"][id]["score"] = min(
-            judge_result["subtasks"][id]["score"], result["score"])
+        subtask_result.update(min(subtask_result.score, partial))
+        if partial == 0:
+          break
       elif type == "max":
-        judge_result["subtasks"][id]["score"] = max(
-            judge_result["subtasks"][id]["score"], result["score"])
-      else:
-        raise Exception("Invalid subtask type")
+        subtask_result.update(max(subtask_result.score, partial))
 
-      report()
+      report_judge_result()
 
-    judge_result["score"] += judge_result["subtasks"][id]["score"]
+    # Step 3.4: finalize subtask result
 
-    status = "Accepted"
-    for subtask in judge_result["subtasks"][id]["cases"]:
-      status = merge_status(status, subtask["status"])
-    judge_result["subtasks"][id]["status"] = status
+    subtask_result.finalize()
+    judge_result.update(id)
+    report_judge_result()
 
-    report()
+  # Step 4: finalize judge result
 
-  status = "Accepted"
-  for _, subtask in judge_result["subtasks"].items():
-    status = merge_status(status, subtask["status"])
-  judge_result["status"] = status
-
-  report()
-  sandbox.terminate()
+  judge_result.finalize_running()
+  report_judge_result()

@@ -5,13 +5,13 @@ def compile(name: str, args: list[str] = []) -> list[str]:
   return cpp.compile(name, ["-std=c++11", *args])
 
 
-def run(name: str, args: list[str] = []) -> list[str]:
-  return cpp.run(name, args)
+def execute(name: str, args: list[str] = []) -> list[str]:
+  return cpp.execute(name, args)
 
 
-def source(name: str) -> str:
-  return cpp.source(name)
+def src(name: str) -> str:
+  return cpp.src(name)
 
 
-def executable(name: str) -> str:
-  return cpp.executable(name)
+def exe(name: str) -> str:
+  return cpp.exe(name)

@@ -5,6 +5,10 @@ import logging
 
 import config
 
+from collections import namedtuple
+
+from scripts.judger.utils.result import Status
+
 _instances = set()
 
 
@@ -43,6 +47,9 @@ class Sandbox:
 
     _instances.add(self)
 
+    if config.DEBUG:
+      print(f"Container {self.container_name} started")
+
   def exec_host(self, cmd):
     if isinstance(cmd, list):
       cmd = ' '.join(map(str, cmd))
@@ -60,22 +67,9 @@ class Sandbox:
         "/bin/sh", "-c", quote(cmd)
     ])
 
-  def exec(self,
-           cmd,
-           stdin="",
-           stdout="",
-           stderr="",
-           time_limit=1,
-           memory_limit=256):
+  def exec(self, cmd, stdin="", stdout="", stderr="", time_limit=1, memory_limit=256):
     if isinstance(cmd, list):
       cmd = ' '.join(map(str, cmd))
-
-    # os.chown(self.base_dir, 1111, 1111)
-    # for root, dirs, files in os.walk(self.base_dir):
-    #   for dir_name in dirs:
-    #     os.chown(os.path.join(root, dir_name), 1111, 1111)
-    #   for file_name in files:
-    #     os.chown(os.path.join(root, file_name), 1111, 1111)
 
     logging.info("exec", cmd)
 
@@ -92,11 +86,13 @@ class Sandbox:
     ])
 
     with open(os.path.join(self.base_dir, "ReSultS.TxT"), "r") as f:
-      status, debug, time, memory = map(lambda x: x.strip(), f.readlines())
+      status, message, time, memory = map(lambda x: x.strip(), f.readlines())
       time = float(time) / 1000
       memory = float(memory) / 1024
+      status = Status["".join(status.split())]
 
-    return (status, debug, time, memory)
+    return namedtuple("SandboxResult",
+                      ["status", "message", "time", "memory"])(status, message, time, memory)
 
   def read(self, path: str) -> str:
     with open(os.path.join(self.base_dir, path), "r") as f:
@@ -145,7 +141,9 @@ class Sandbox:
         self.container_name
     ])
 
-    if not config.DEBUG:
+    if config.DEBUG:
+      print(f"Container {self.container_name} stopped")
+    else:
       shutil.rmtree(self.base_dir)
 
     _instances.remove(self)

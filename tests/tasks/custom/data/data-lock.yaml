@@ -1,0 +1,44 @@
+checker:
+  name: lcmp
+  type: default
+extraJudgerInfo: {}
+extraSourceFiles: []
+fileIO:
+  input: .stdin
+  output: .stdout
+judger: judger.py
+memory: 256.0
+submitFiles:
+- languages:
+  - c
+  - cpp
+  - cpp11
+  - cpp14
+  - cpp17
+  - cpp11-clang
+  - cpp17-clang
+  - haskell
+  - pascal
+  - java
+  - python2
+  - python3
+  - rust
+  - nodejs
+  - swift
+  - csharp
+  - text
+  - zip
+  - binary
+  name: code
+subtasks:
+- cases:
+  - input: 1.in
+    output: 1.ans
+  depends: []
+  id: 1
+  memory: 256.0
+  score: 100.0
+  time: 1.0
+  type: sum
+time: 1.0
+type: custom

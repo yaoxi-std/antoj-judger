@@ -305,7 +305,7 @@ def lock(data: dict, base_dir: str) -> dict:
     elif type == "submit-answer":
       available_langs = ["zip"]
     elif type == "custom":
-      available_langs = ["text", "zip", "binary"]
+      available_langs = [*LANGUAGES, "text", "zip", "binary"]
     else:
       raise ValueError(f"Invalid type: {type}")
 

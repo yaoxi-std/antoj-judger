@@ -12,7 +12,7 @@ join = os.path.join
 
 
 def judge(data_path: str, source_path: str, data: dict):
-  print("Copied from default.py")
+  print("Custom judger copied from default.py")
   
   sandbox = Sandbox()
 
@@ -81,8 +81,6 @@ def judge(data_path: str, source_path: str, data: dict):
 
   sandbox.pull(code.exe("code"), join(source_path, code.exe("code")))
   sandbox.clean()
-
-  report_judge_result()
 
   # Step 3: test cases execution
 

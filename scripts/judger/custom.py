@@ -1,9 +1,10 @@
+import os
 import sys
 import importlib
 
 
 def judge(data_path: str, source_path: str, data: dict):
-  judger = data["judger"]
+  judger = os.path.join(data_path, data["judger"])
   name = __package__ + ".custom_judger"
   spec = importlib.util.spec_from_file_location(name, judger)
   module = importlib.util.module_from_spec(spec)

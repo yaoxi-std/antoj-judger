@@ -188,6 +188,9 @@ def lock(data: dict, base_dir: str) -> dict:
       cases = []
       for case in subtask["cases"]:
         cases.extend(parse_case(case))
+      
+      if cases.__len__() == 0:
+        raise ValueError(f"No cases found for subtask {subid}")
 
       subtasks_locked.append({
           "type": type,
@@ -397,7 +400,7 @@ def lock(data: dict, base_dir: str) -> dict:
           "languages": parse_languages(locked["type"], data.get("languages")),
       }]
     locked["extraSourceFiles"] = parse_extra(data.get("extraSourceFiles", []))
-    locked["extraJudgerInfo"] = data["extraJudgerInfo"] or {}
+    locked["extraJudgerInfo"] = data.get("extraJudgerInfo", {})
 
     judger = data.get("judger", "judger.py")
     if not os.path.isfile(os.path.join(base_dir, judger)):

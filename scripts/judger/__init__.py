@@ -2,13 +2,17 @@ import os
 import yaml
 import logging
 
+from .utils.report import *
+
 from .utils import sandbox
 from .utils.down import download_task
-from .utils.result import Status, initialize_judge_task, judge_result, report_judge_result
+from .utils.result import Status
 
 
 def judge(task: dict):
   initialize_judge_task(task)
+
+  judge_result = current_judge_result()
 
   data_path, source_path = download_task(task)
 
@@ -16,7 +20,6 @@ def judge(task: dict):
     data = yaml.load(f, Loader=yaml.FullLoader)
 
   try:
-    # TODO: Implement more judge types
     if data["type"] == "default":
       from .default import judge
       judge(data_path, source_path, data)
@@ -104,7 +107,18 @@ if __name__ == "__main__":
               **url_with_md5("default.subtasks/code/4.cpp")
           }],
       },
+      {
+          "id": 6,
+          "data": url_with_md5("custom/data.tar"),
+          "submitFiles": [{
+              "name": "code",
+              "language": "cpp17",
+              **url_with_md5("custom/code/1.cpp")
+          }],
+      },
   ]
 
   import sys
-  judge(tasks[int(sys.argv[1])])
+
+  for i in range(1, len(sys.argv)):
+    judge(tasks[int(sys.argv[i])])

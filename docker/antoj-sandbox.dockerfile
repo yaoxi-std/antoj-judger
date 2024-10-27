@@ -4,7 +4,28 @@ RUN useradd sandbox -m --home-dir /sandbox --uid 1111
 VOLUME ["/sandbox"]
 
 RUN apt-get update --fix-missing
-RUN apt-get -y install build-essential
+
+# c, cpp
+RUN apt-get install -y build-essential clang
+# python2, python3
+RUN apt-get install -y python2 python3
+# java
+RUN apt-get install -y openjdk-17-jdk-headless
+# pascal
+RUN apt-get install -y fpc
+# haskell
+RUN apt-get install -y ghc
+# rust
+RUN apt-get install -y rustc
+# go
+RUN apt-get install -y golang
+# ruby
+RUN apt-get install -y ruby
+# nodejs
+RUN apt-get install -y nodejs
+# csharp
+RUN apt-get install -y mono-mcs
+
 RUN apt-get -y upgrade
 
 COPY docker/antoj-sandbox /root

@@ -14,7 +14,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TMP_PATH = os.getenv("TMP_DIR", os.path.join(BASE_DIR, "tmp"))
 DATA_PATH = os.getenv("DATA_PATH", os.path.join(BASE_DIR, "data"))
 
-TESTLIB_PATH = os.getenv("TESTLIB_PATH", os.path.join(BASE_DIR, "scripts", "testlib.h"))
+TESTLIB_PATH = os.getenv("TESTLIB_PATH", os.path.join(BASE_DIR, "include", "testlib.h"))
 CHECKER_PATH = os.getenv("CHECKER_PATH", os.path.join(BASE_DIR, "scripts", "checker"))
 
 SUBMIT_PATH = os.getenv(

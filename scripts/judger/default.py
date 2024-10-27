@@ -100,7 +100,7 @@ def judge(data_path: str, source_path: str, data: dict):
 
     skip_subtask = False
     for depend in depends:
-      if judge_result["subtasks"][depend]["status"] != "Accepted":
+      if judge_result.subtasks[depend].status != Status.Accepted:
         skip_subtask = True
         break
 
@@ -151,7 +151,7 @@ def judge(data_path: str, source_path: str, data: dict):
 
       stdout = sandbox.read(file_out)
 
-      sandbox.pull(output, os.path.join(source_path, "user_out"))
+      sandbox.pull(file_out, os.path.join(source_path, "user_out"))
       sandbox.clean()
 
       # Step 3.3.5: check if user code executed successfully

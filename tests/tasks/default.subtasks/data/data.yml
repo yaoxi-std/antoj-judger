@@ -34,9 +34,6 @@ subtasks:
         output: /^output(4[a-zA-Z]).txt$/
 inputFile: "#.in"
 outputFile: "#.ans"
-fileIO:
-  input: __stdin__
-  output: __stdout__
 checker:
   type: custom
   name: spj_cpp17.cpp

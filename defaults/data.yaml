@@ -14,10 +14,8 @@ subtasks:
       - input: /^(input)([0-9]+).txt$/
         output: /^(answer)([0-9]+).txt$/
 fileIO:
-  input: __stdin__
-  output: __stdout__
+  input: .stdin
+  output: .stdout
 checker:
   type: default
   name: lcmp
-submitFiles:
-  - name: code

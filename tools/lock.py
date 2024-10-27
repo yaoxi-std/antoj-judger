@@ -270,6 +270,8 @@ def lock(data: dict, base_dir: str) -> dict:
     }
 
   def parse_extra(extra: list) -> list:
+    extra = extra or []
+
     extra_locked = []
 
     for file in extra:
@@ -362,22 +364,41 @@ def lock(data: dict, base_dir: str) -> dict:
       "checker": parse_checker(data["checker"]),
   }
 
-  locked["type"] = parse_type(data["type"])
-  locked["time"] = parse_time(data["time"])
-  locked["memory"] = parse_memory(data["memory"])
-  locked["subtasks"] = parse_subtasks(data["subtasks"])
-  locked["fileIO"] = parse_file_io(data["fileIO"])
-  locked["checker"] = parse_checker(data["checker"])
-  locked["submitFiles"] = parse_submit(data["submitFiles"])
+  if locked["type"] in ["default", "interactive"]:
+    if "submitFiles" in data:
+      raise ValueError(f"Submit files are not allowed for {
+                       locked['type']} type")
+    locked["submitFiles"] = [{
+        "name": "code",
+        "languages": parse_languages(locked["type"], data.get("languages")),
+    }]
+    locked["extraSourceFiles"] = parse_extra(data.get("extraSourceFiles"))
 
-  if locked["type"] == "interactive":
-    locked["interactor"] = parse_interactor(data["interactor"])
+    if locked["type"] == "interactive":
+      locked["interactor"] = parse_interactor(data["interactor"])
 
-  if locked["type"] in ["default", "interactive", "custom"]:
-    locked["extraSourceFiles"] = parse_extra(
-        data.get("extraSourceFiles") or [])
+  elif locked["type"] in ["submit-answer", "objective"]:
+    if "submitFiles" in data:
+      raise ValueError(f"Submit files are not allowed for {
+                       locked['type']} type")
+    locked["submitFiles"] = [{
+        "name": "answer",
+        "languages": ["zip" if locked["type"] == "submit-answer" else "text"],
+    }]
+    if "extraSourceFiles" in data:
+      raise ValueError(f"Extra source files are not allowed for {
+                       locked['type']} type")
+    locked["extraSourceFiles"] = []
 
-  if locked["type"] == "custom":
+  else:
+    if "submitFiles" in data:
+      locked["submitFiles"] = parse_submit(data["submitFiles"])
+    else:
+      locked["submitFiles"] = [{
+          "name": "code",
+          "languages": parse_languages(locked["type"], data.get("languages")),
+      }]
+    locked["extraSourceFiles"] = parse_extra(data.get("extraSourceFiles"))
     locked["extraJudgerInfo"] = data["extraJudgerInfo"] or {}
 
   return locked

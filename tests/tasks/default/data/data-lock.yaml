@@ -3,8 +3,8 @@ checker:
   type: default
 extraSourceFiles: []
 fileIO:
-  input: __stdin__
-  output: __stdout__
+  input: .stdin
+  output: .stdout
 memory: 256.0
 submitFiles:
 - languages:

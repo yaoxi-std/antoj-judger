@@ -89,4 +89,5 @@ if __name__ == "__main__":
       },
   ]
 
-  judge(tasks[0])
+  import sys
+  judge(tasks[int(sys.argv[1])])

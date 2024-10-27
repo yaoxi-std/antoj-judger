@@ -18,9 +18,6 @@ RUN apt-get install -y python2 python3
 # java
 RUN apt-get install -y openjdk-17-jdk-headless
 
-# pascal
-RUN apt-get install -y fpc
-
 # haskell
 RUN apt-get install -y ghc
 
@@ -36,15 +33,20 @@ RUN apt-get install -y ruby
 # csharp
 RUN apt-get install -y mono-mcs
 
+# pascal
+# # Wonder why it fails. Just skip it LOL.
+# RUN apt-get install -y fpc
+
 # nodejs
 RUN apt-get install -y curl && \
   curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
   apt-get install -y nodejs
 
 # swift
-RUN apt-get install -y software-properties-common && \
-  add-apt-repository ppa:swiftlang/ppa && \
-  apt-get update && apt-get install -y swift
+# # This also fails.
+# RUN apt-get install -y software-properties-common && \
+#   add-apt-repository ppa:swiftlang/ppa && \
+#   apt-get update && apt-get install -y swift
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 

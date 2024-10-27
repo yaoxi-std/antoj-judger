@@ -1,6 +1,8 @@
 type: default
 time: 1.0s
 memory: 256.0MB
+inputFile: "#.in"
+outputFile: "#.ans"
 subtasks:
   - score: 100
     type: sum

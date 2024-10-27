@@ -146,3 +146,17 @@ class JudgeResult:
     for subtask in self.subtasks.values():
       status = merge_status(status, subtask.status)
     self.status = status
+
+def as_dict(obj: any) -> dict:
+  if isinstance(obj, dict):
+    return {key: as_dict(value) for key, value in obj.items()}
+  elif isinstance(obj, list):
+    return [as_dict(value) for value in obj]
+  elif isinstance(obj, Status):
+    return obj.name
+  elif hasattr(obj, "__dataclass_fields__"):
+    return {key: as_dict(getattr(obj, key)) for key in obj.__dataclass_fields__}
+  elif isinstance(obj, (int, float, str, bool)):
+    return obj
+  else:
+    return obj.__dict__

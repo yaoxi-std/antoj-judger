@@ -80,8 +80,6 @@ def judge(data_path: str, source_path: str, data: dict):
   sandbox.pull(code.exe("code"), join(source_path, code.exe("code")))
   sandbox.clean()
 
-  report_judge_result()
-
   # Step 3: test cases execution
 
   judge_result.initialize_running()

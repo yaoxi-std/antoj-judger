@@ -1,12 +1,15 @@
 import sys
-import signal
+import json
 import time
+import signal
 import requests
 import logging
 
 import config
 import scripts
-from scripts.judger.utils import terminate_all
+
+from scripts import judger
+from scripts.judger.utils.sandbox import terminate_all
 
 
 def fetch_info() -> dict:
@@ -19,7 +22,7 @@ def fetch_info() -> dict:
 
 
 def fetch_task() -> dict:
-  r = requests.post(config.FETCH_URL, json={"token": config.WEB_TOKEN})
+  r = requests.post(config.TASK_URL, json={"token": config.WEB_TOKEN})
 
   if r.status_code != 200:
     raise Exception("Failed to fetch task: " + r.text)
@@ -28,7 +31,9 @@ def fetch_task() -> dict:
 
 
 def judge_task(task: dict):
-  print(task)
+  logging.info("Fetched task: " + json.dumps(task))
+
+  judger.judge(task)
 
 
 def main():

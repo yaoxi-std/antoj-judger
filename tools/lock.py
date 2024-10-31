@@ -188,7 +188,7 @@ def lock(data: dict, base_dir: str) -> dict:
       cases = []
       for case in subtask["cases"]:
         cases.extend(parse_case(case))
-      
+
       if cases.__len__() == 0:
         raise ValueError(f"No cases found for subtask {subid}")
 
@@ -367,8 +367,8 @@ def lock(data: dict, base_dir: str) -> dict:
 
   if locked["type"] in ["default", "interactive"]:
     if "submitFiles" in data:
-      raise ValueError(f"Submit files are not allowed for {
-                       locked['type']} type")
+      raise ValueError(
+          f"Submit files are not allowed for {locked['type']} type")
     locked["submitFiles"] = [{
         "name": "code",
         "languages": parse_languages(locked["type"], data.get("languages")),
@@ -380,15 +380,15 @@ def lock(data: dict, base_dir: str) -> dict:
 
   elif locked["type"] in ["submit-answer", "objective"]:
     if "submitFiles" in data:
-      raise ValueError(f"Submit files are not allowed for {
-                       locked['type']} type")
+      raise ValueError(
+          f"Submit files are not allowed for {locked['type']} type")
     locked["submitFiles"] = [{
         "name": "answer",
         "languages": ["zip" if locked["type"] == "submit-answer" else "text"],
     }]
     if "extraSourceFiles" in data:
-      raise ValueError(f"Extra source files are not allowed for {
-                       locked['type']} type")
+      raise ValueError(
+          f"Extra source files are not allowed for {locked['type']} type")
     locked["extraSourceFiles"] = []
 
   else:

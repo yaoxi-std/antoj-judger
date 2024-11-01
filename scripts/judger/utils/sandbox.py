@@ -75,7 +75,7 @@ class Sandbox:
     if isinstance(cmd, list):
       cmd = ' '.join(map(str, cmd))
 
-    logging.info("exec", cmd)
+    logging.info(f"exec {cmd}")
 
     self.exec_container([
         "ulimit", "-s", "unlimited",

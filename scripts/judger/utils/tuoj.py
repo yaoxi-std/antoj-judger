@@ -28,10 +28,26 @@ def report_judge_result(report, judged):
   results = {}
   
   logging.debug(judge_result)
-
-  if judge_result.status not in [Status.Waiting, Status.Compiling, Status.SystemError]:
+  
+  if judge_result.status == Status.SystemError:
     results["Compilation"] = {
-        "status": "Compilation Error" if judge_result.status == Status.CompileError else "Compilation Success",
+        "status": "System Error",
+        "ext_info": {
+            "Compilation Info": judge_result.message
+        },
+        "is_final": judged
+    }
+  elif judge_result.status == Status.CompileError:
+    results["Compilation"] = {
+        "status": "Compilation Error",
+        "ext_info": {
+            "Compilation Info": judge_result.message
+        },
+        "is_final": judged
+    }
+  elif judge_result.status not in [Status.Waiting, Status.Compiling]:
+    results["Compilation"] = {
+        "status": "Compilation Success",
         "ext_info": {
             "Compilation Info": judge_result.message
         },

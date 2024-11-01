@@ -4,8 +4,7 @@ from urllib.parse import urljoin
 
 DEBUG = os.getenv("DEBUG", "false") == "true"
 
-if DEBUG:
-  logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG if DEBUG else logging.INFO)
 
 WEB_HOST = os.getenv("WEB_HOST", "http://localhost:8010")
 WEB_TOKEN = os.getenv("WEB_TOKEN", "farfarfaraway")

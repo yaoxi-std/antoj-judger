@@ -1,3 +1,4 @@
+import logging
 import requests
 
 from .report import *
@@ -25,6 +26,8 @@ def report_judge_result(report, judged):
   judge_task = current_judge_task()
   judge_result = current_judge_result()
   results = {}
+  
+  logging.debug(judge_result)
 
   if judge_result.status not in [Status.Waiting, Status.Compiling, Status.SystemError]:
     results["Compilation"] = {
@@ -52,6 +55,8 @@ def report_judge_result(report, judged):
       "token": config.WEB_TOKEN,
       "results": results
   }
+  
+  logging.debug(frm)
   
   requests.post(config.REPORT_URL, json=frm)
   

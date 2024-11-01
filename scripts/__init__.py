@@ -6,7 +6,7 @@ LANGUAGES = []
 
 for item in os.listdir(os.path.join(BASE_DIR, "scripts/languages")):
   if item.endswith(".py"):
-    LANGUAGES.append(item[:-3])
+    LANGUAGES.append(item[:-3].replace("_", "-"))
 
 INTERNAL_CHECKERS = []
 

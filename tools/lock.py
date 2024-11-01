@@ -13,9 +13,9 @@ with open(os.path.join(DIR, "../defaults/data.yaml"), "r") as f:
 INTERNAL_CHECKERS = ["fcmp", "hcmp", "lcmp", "ncmp",
                      "nyesno", "rcmp4", "rcmp6", "rcmp9", "wcmp", "yesno"]
 
-LANGUAGES = ["c", "cpp", "cpp11", "cpp14", "cpp17",
-             "cpp11-clang", "cpp17-clang", "haskell", "pascal",
-             "java", "python2", "python3", "rust", "nodejs", "swift", "csharp"]
+LANGUAGES = ["c", "c11", "cpp", "cpp11", "cpp14", "cpp17",
+             "cpp-clang", "cpp11-clang", "cpp14-clang", "cpp17-clang",
+             "csharp", "haskell", "java", "nodejs", "python2", "python3", "rust"]
 
 
 def lock(data: dict, base_dir: str) -> dict:

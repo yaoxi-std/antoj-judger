@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 
 from flask import Flask, jsonify, request, send_from_directory
@@ -97,6 +98,7 @@ if __name__ == '__main__':
       },
   ]
 
-  judge_queue.put(tasks[5])
+  for i in range(1, sys.argv.__len__()):
+    judge_queue.put(tasks[int(sys.argv[i])])
 
   app.run(port=8010, debug=True)

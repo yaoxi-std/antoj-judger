@@ -51,6 +51,7 @@ def main():
 
   while True:
     task = fetch_task()
+    print(task)
     if task["id"] != -1:
       idle = 1
       judge_task(task)

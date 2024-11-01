@@ -1,10 +1,11 @@
 import os
+import logging
 from urllib.parse import urljoin
 
 DEBUG = os.getenv("DEBUG", "false") == "true"
 
 WEB_HOST = os.getenv("WEB_HOST", "http://localhost:8010")
-WEB_TOKEN = os.getenv("WEB_TOKEN", "MyRatingIs1064")
+WEB_TOKEN = os.getenv("WEB_TOKEN", "farfarfaraway")
 
 INFO_URL = urljoin(WEB_HOST, "/api/judge/info")
 TASK_URL = urljoin(WEB_HOST, "/api/judge/task")

@@ -34,31 +34,5 @@ def current_judge_result() -> JudgeResult | None:
 
 
 def report_judge_result(report=False, judged=False) -> bool:
-  report = report or judged
-
-  logging.debug("Judge Result:", _judge_result)
-
-  global _last_report_time
-  current_time = time.time()
-
-  if (not report and _last_report_time and
-          current_time - _last_report_time < config.JUDGER_REPORT_TIME):
-    return
-  _last_report_time = current_time
-
-  payload = {
-      "id": _judge_task["id"],
-      "token": config.WEB_TOKEN,
-      "judged": judged,
-      **as_dict(_judge_result),
-  }
-
-  logging.info("Report Judge Result: ", json.dumps(payload))
-
-  r = requests.post(config.REPORT_URL, json=payload)
-
-  if r.status_code != 200 or r.json()["status"] != "success":
-    logging.error("Failed to report judge result: ", r.text)
-    return False
-
-  return True
+  from . import tuoj
+  tuoj.report_judge_result(report, judged)

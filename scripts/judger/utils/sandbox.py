@@ -54,7 +54,7 @@ class Sandbox:
     if isinstance(cmd, list):
       cmd = ' '.join(map(str, cmd))
       
-    logging.debug("exec_host", cmd)
+    logging.debug(f"exec_host {cmd}")
     
     return os.system(cmd)
 
@@ -62,7 +62,7 @@ class Sandbox:
     if isinstance(cmd, list):
       cmd = ' '.join(map(str, cmd))
       
-    logging.debug("exec_container", cmd)
+    logging.debug(f"exec_container {cmd}")
     
     return self.exec_host([
         "docker", "exec",

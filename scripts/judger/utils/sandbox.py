@@ -48,7 +48,7 @@ class Sandbox:
     _instances.add(self)
 
     if config.DEBUG:
-      print(f"Container {self.container_name} started")
+      logging.info(f"Container {self.container_name} started")
 
   def exec_host(self, cmd):
     if isinstance(cmd, list):
@@ -146,7 +146,7 @@ class Sandbox:
     ])
 
     if config.DEBUG:
-      print(f"Container {self.container_name} stopped")
+      logging.info(f"Container {self.container_name} stopped")
     else:
       shutil.rmtree(self.base_dir)
 

@@ -4,6 +4,9 @@ from urllib.parse import urljoin
 
 DEBUG = os.getenv("DEBUG", "false") == "true"
 
+if DEBUG:
+  logging.basicConfig(level=logging.DEBUG)
+
 WEB_HOST = os.getenv("WEB_HOST", "http://localhost:8010")
 WEB_TOKEN = os.getenv("WEB_TOKEN", "farfarfaraway")
 
@@ -34,5 +37,5 @@ if not os.path.exists(TMP_PATH):
 if not os.path.exists(DATA_PATH):
   os.makedirs(DATA_PATH)
 
-print(f"WEB_HOST: {WEB_HOST}")
-print(f"WEB_TOKEN: {WEB_TOKEN}")
+logging.info(f"WEB_HOST: {WEB_HOST}")
+logging.info(f"WEB_TOKEN: {WEB_TOKEN}")

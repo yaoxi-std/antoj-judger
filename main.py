@@ -51,7 +51,7 @@ def main():
 
   while True:
     task = fetch_task()
-    print(task)
+    logging.info(task)
     if task["id"] != -1:
       idle = 1
       judge_task(task)
@@ -61,7 +61,7 @@ def main():
 
 
 def handle_sigint(signum, frame):
-  print("\nSIGINT received. Exiting...")
+  logging.info("\nSIGINT received. Exiting...")
   terminate_all()
   sys.exit(0)
 

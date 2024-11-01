@@ -29,15 +29,7 @@ def report_judge_result(report, judged):
   
   logging.debug(judge_result)
   
-  if judge_result.status == Status.SystemError:
-    results["Compilation"] = {
-        "status": "System Error",
-        "ext_info": {
-            "Compilation Info": judge_result.message
-        },
-        "is_final": judged
-    }
-  elif judge_result.status == Status.CompileError:
+  if judge_result.status in [Status.SystemError, Status.CompileError]:
     results["Compilation"] = {
         "status": "Compilation Error",
         "ext_info": {

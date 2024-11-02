@@ -33,8 +33,6 @@ class Sandbox:
     self.host_dir_tmp = os.path.join(self.host_dir, "tmp")
     self.base_dir_sandbox = os.path.join(self.base_dir, "sandbox")
     self.host_dir_sandbox = os.path.join(self.host_dir, "sandbox")
-    print(self.base_dir_tmp)
-    print(self.base_dir_sandbox)
 
     os.makedirs(self.base_dir_tmp, exist_ok=True)
     os.makedirs(self.base_dir_sandbox, exist_ok=True)

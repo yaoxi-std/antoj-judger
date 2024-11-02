@@ -50,15 +50,15 @@ def report_judge_result(report, judged):
 
   if judge_result.status in [Status.SystemError, Status.CompileError]:
     results["Compilation"] = {
-        "status": "Compilation Error",
+        "status": TUOJ_STATUS[judge_result.status],
         "ext_info": judge_result.message,
-        "is_final": judged
+        "is_final": False
     }
   elif judge_result.status not in [Status.Waiting, Status.Compiling]:
     results["Compilation"] = {
         "status": "Compilation Success",
         "ext_info": judge_result.message,
-        "is_final": judged
+        "is_final": False
     }
 
   for i, subtask in judge_result.subtasks.items():

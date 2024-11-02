@@ -4,15 +4,15 @@ import config
 
 from .utils.result import *
 from .utils.report import *
+from .utils.sandbox import instance as sandbox_instance
 
 from .utils.lang import select_language
-from .utils.sandbox import Sandbox
 
 join = os.path.join
 
 
 def judge(data_path: str, source_path: str, data: dict):
-  sandbox = Sandbox()
+  sandbox = sandbox_instance()
 
   judge_task = current_judge_task()
   judge_result = current_judge_result()

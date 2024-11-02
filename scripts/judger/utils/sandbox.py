@@ -9,6 +9,7 @@ from collections import namedtuple
 
 from scripts.judger.utils.result import Status
 
+_instance = None
 _instances = set()
 
 
@@ -19,6 +20,9 @@ def quote(s):
 
 class Sandbox:
   def __init__(self, cpus=1, memory="2g", container_prefix="sandbox_"):
+    if len(_instances) >= config.MAX_SANDBOX_INSTANCES:
+      raise Exception("Too many sandbox instances")
+
     self.id = uuid.uuid4().hex
     self.cpus = cpus
     self.memory = memory
@@ -28,7 +32,7 @@ class Sandbox:
         config.SANDBOX_DATA_PATH, self.container_name)
     self.host_dir = os.path.join(
         config.HOST_SANDBOX_DATA_PATH, self.container_name)
-    
+
     self.base_dir_tmp = os.path.join(self.base_dir, "tmp")
     self.host_dir_tmp = os.path.join(self.host_dir, "tmp")
     self.base_dir_sandbox = os.path.join(self.base_dir, "sandbox")
@@ -60,17 +64,17 @@ class Sandbox:
   def exec_host(self, cmd):
     if isinstance(cmd, list):
       cmd = ' '.join(map(str, cmd))
-      
+
     logging.debug(f"exec_host {cmd}")
-    
+
     return os.system(cmd)
 
   def exec_container(self, cmd):
     if isinstance(cmd, list):
       cmd = ' '.join(map(str, cmd))
-      
+
     logging.debug(f"exec_container {cmd}")
-    
+
     return self.exec_host([
         "docker", "exec",
         "-w", "/sandbox",
@@ -164,6 +168,13 @@ class Sandbox:
       shutil.rmtree(self.base_dir)
 
     _instances.remove(self)
+
+
+def instance():
+  global _instance
+  if _instance is None or _instance not in _instances:
+    _instance = Sandbox()
+  return _instance
 
 
 def terminate_all():

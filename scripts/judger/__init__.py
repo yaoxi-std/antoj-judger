@@ -48,4 +48,3 @@ def judge(task: dict):
     judge_result.message = "System error occurred during judging.\n" + str(e)
 
   report_judge_result(report=True, judged=True)
-  sandbox.terminate_all()

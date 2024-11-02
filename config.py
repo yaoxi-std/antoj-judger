@@ -36,6 +36,8 @@ JUDGER_REPORT_TIME = float(os.getenv("JUDGER_REPORT_TIME", 1))
 ALLOW_CUSTOM_JUDGER = os.getenv(
     "ALLOW_CUSTOM_JUDGER", "false") == "true" or DEBUG
 
+MAX_SANDBOX_INSTANCES = int(os.getenv("MAX_SANDBOX_INSTANCES", 4))
+
 if not os.path.exists(TMP_PATH):
   os.makedirs(TMP_PATH)
 if not os.path.exists(DATA_PATH):

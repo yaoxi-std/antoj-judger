@@ -37,6 +37,7 @@ SHORT_STATUS = {
     Status.SystemError: "?",
 }
 
+
 def parse_ext_info(cases: list[CaseResult]):
   return "".join([f"{SHORT_STATUS[case.status]}" for case in cases])
 
@@ -61,7 +62,13 @@ def report_judge_result(report, judged):
         "is_final": judged
     }
 
+  max_case = 0
+  running_case = 0
+
   for i, subtask in judge_result.subtasks.items():
+    max_case = max(max_case, i)
+    if subtask.status == Status.Running:
+      running_case = i
     results[i] = {
         "status": TUOJ_STATUS[subtask.status],
         "time": subtask.max_time * 1000,
@@ -71,9 +78,15 @@ def report_judge_result(report, judged):
         "is_final": judged
     }
 
+  if judge_result.status == Status.Running:
+    status = f"Running on case {running_case or (max_case + 1)}"
+  else:
+    status = TUOJ_STATUS[judge_result.status]
+
   frm = {
       "run_id": judge_task["id"],
       "token": config.WEB_TOKEN,
+      "status":  status,
       "results": results
   }
 

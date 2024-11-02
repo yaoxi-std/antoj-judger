@@ -28,8 +28,16 @@ class Sandbox:
         config.SANDBOX_DATA_PATH, self.container_name)
     self.host_dir = os.path.join(
         config.HOST_SANDBOX_DATA_PATH, self.container_name)
+    
+    self.base_dir_tmp = os.path.join(self.base_dir, "tmp")
+    self.host_dir_tmp = os.path.join(self.host_dir, "tmp")
+    self.base_dir_sandbox = os.path.join(self.base_dir, "sandbox")
+    self.host_dir_sandbox = os.path.join(self.host_dir, "sandbox")
+    print(self.base_dir_tmp)
+    print(self.base_dir_sandbox)
 
-    os.makedirs(self.base_dir, exist_ok=True)
+    os.makedirs(self.base_dir_tmp, exist_ok=True)
+    os.makedirs(self.base_dir_sandbox, exist_ok=True)
 
     self.exec_host([
         "> /dev/null",
@@ -38,7 +46,8 @@ class Sandbox:
         "--memory", self.memory,
         "--network", "none",
         "--name", self.container_name,
-        "--volume", f"\"{self.host_dir}\":/sandbox",
+        "--volume", f"\"{self.host_dir_tmp}\":/tmp",
+        "--volume", f"\"{self.host_dir_sandbox}\":/sandbox",
         "-d", "--rm",
         "antoj-sandbox",
         "/bin/sh", "-c",
@@ -89,7 +98,7 @@ class Sandbox:
         cmd
     ])
 
-    with open(os.path.join(self.base_dir, "ReSultS.TxT"), "r") as f:
+    with open(os.path.join(self.base_dir_sandbox, "ReSultS.TxT"), "r") as f:
       status, message, time, memory = map(lambda x: x.strip(), f.readlines())
       time = float(time) / 1000
       memory = float(memory) / 1024
@@ -99,40 +108,46 @@ class Sandbox:
                       ["status", "message", "time", "memory"])(status, message, time, memory)
 
   def read(self, path: str) -> str:
-    with open(os.path.join(self.base_dir, path), "r") as f:
+    with open(os.path.join(self.base_dir_sandbox, path), "r") as f:
       return f.read()
 
   def write(self, path: str, text: str):
-    with open(os.path.join(self.base_dir, path), "w") as f:
+    with open(os.path.join(self.base_dir_sandbox, path), "w") as f:
       f.write(text)
 
   def exists(self, path: str):
-    return os.path.exists(os.path.join(self.base_dir, path))
+    return os.path.exists(os.path.join(self.base_dir_sandbox, path))
 
   def push(self, srcpath: str, dstpath: str):
-    dstpath = os.path.join(self.base_dir, dstpath)
+    dstpath = os.path.join(self.base_dir_sandbox, dstpath)
     if os.path.isfile(srcpath):
       shutil.copy(srcpath, dstpath)
     else:
       shutil.copytree(srcpath, dstpath)
 
   def pull(self, srcpath: str, dstpath: str):
-    srcpath = os.path.join(self.base_dir, srcpath)
+    srcpath = os.path.join(self.base_dir_sandbox, srcpath)
     if os.path.isfile(srcpath):
       shutil.copy(srcpath, dstpath)
     else:
       shutil.copytree(srcpath, dstpath)
 
   def delete(self, path: str):
-    path = os.path.join(self.base_dir, path)
+    path = os.path.join(self.base_dir_sandbox, path)
     if os.path.isfile(path):
       os.remove(path)
     else:
       shutil.rmtree(path)
 
   def clean(self):
-    for item in os.listdir(self.base_dir):
-      item = os.path.join(self.base_dir, item)
+    for item in os.listdir(self.base_dir_tmp):
+      item = os.path.join(self.base_dir_tmp, item)
+      if os.path.isfile(item):
+        os.remove(item)
+      else:
+        shutil.rmtree(item)
+    for item in os.listdir(self.base_dir_sandbox):
+      item = os.path.join(self.base_dir_sandbox, item)
       if os.path.isfile(item):
         os.remove(item)
       else:

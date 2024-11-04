@@ -215,12 +215,12 @@ def lock(data: dict, base_dir: str) -> dict:
     if "input" in file_io:
       file_io_locked["input"] = file_io["input"]
     else:
-      file_io_locked["input"] = "__stdin__"
+      file_io_locked["input"] = ".stdin"
 
     if "output" in file_io:
       file_io_locked["output"] = file_io["output"]
     else:
-      file_io_locked["output"] = "__stdout__"
+      file_io_locked["output"] = ".stdout"
 
     return file_io_locked
 

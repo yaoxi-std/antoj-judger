@@ -109,6 +109,11 @@ int main(int argc, char *argv[]) {
 
 	chdir("/sandbox");
 
+	if (chown(".", SANDBOX_UID, SANDBOX_GID) == -1) {
+		perror("chown failed");
+		return -1;
+	}
+
 	load_config(argc, argv);
 	// print_config();
 

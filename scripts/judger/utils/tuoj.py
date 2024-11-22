@@ -5,7 +5,7 @@ from .report import *
 from .result import Status, CaseResult
 
 TUOJ_STATUS = {
-    Status.Waiting: "Waiting",
+    Status.Waiting: "Running",
     Status.Compiling: "Running",
     Status.Running: "Running",
     Status.Accepted: "Accepted",
